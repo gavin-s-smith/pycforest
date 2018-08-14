@@ -5,9 +5,9 @@ long_description = """A library that provides a wrapper for an R implementation 
 """
 
 setup(
-    name='rfpimp',
-    version='1.2',
-    url='https://github.com/parrt/random-forest-importances',
+    name='pycforest',
+    version='0.1',
+    url='https://github.com/gavin-s-smith/pycforest',
     license='MIT',
     py_modules=['pycforest'],
     author='Gavin Smith',
