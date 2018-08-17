@@ -225,7 +225,10 @@ class pycforest(object):
         df_p = pandas2ri.ri2py(rtn)
         
         df = pd.DataFrame(df_p,columns=["importance"])
-        df = df.assign(factors = vars)
+        print(df.shape)
+        print(vars.shape)
+        print(list(vars)+['interaction'])
+        df = df.assign(factors = list(vars)+['interaction'])
         
         return df
         
