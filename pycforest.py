@@ -193,7 +193,7 @@ class pycforest(object):
         
         return self.oob_prediction_accuracy
         
-    def permutation_importance(self, interaction = False, oob = True, vars = None, type = "aggregate", nperm = 10, gav_method = True):
+    def permutation_importance(self, interaction = False, oob = True, vars = None, type = "aggregate", nperm = 10): #, gav_method = True):
         
         """
         Computes the permutation importance.
@@ -220,7 +220,7 @@ class pycforest(object):
         if vars is None:
             vars = self.X.columns
                   
-        rtn = r.variable_importance(self.r_model, var = vars, type = type, nperm = nperm, oob=oob, interaction = interaction, gav_method = gav_method)
+        rtn = r.variable_importance(self.r_model, var = vars, type = type, nperm = nperm, oob=oob, interaction = interaction)#, gav_method = gav_method)
          
         df_p = pandas2ri.ri2py(rtn)
         
@@ -231,15 +231,15 @@ class pycforest(object):
         
     
 if __name__ == '__main__':
-    rf = RTree2(n_trees=500)
+    rf = pycforest(n_trees=500)
     X = pd.read_csv("test_X.csv").iloc[0:100,:]
     y = pd.read_csv("test_y.csv").iloc[0:100,:]
     y['labels'] = y['labels'].astype(str)
   
     
     rf.fit(X,y)
-    print(rf.predict(X))
-    print(y)
-#     print(rf.get_oob_prediction_accuracy())
-#     print(rf.permutation_importance())
+    #print(rf.predict(X))
+    #print(y)
+#    print(rf.get_oob_prediction_accuracy())
+    print(rf.permutation_importance(interaction = True))
     

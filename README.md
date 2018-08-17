@@ -8,4 +8,5 @@ See:
 https://cran.r-project.org/web/packages/party/party.pdf
 https://cran.r-project.org/web/packages/edarf/edarf.pdf
 
-
+Install via:
+sudo pip3 install git+https://github.com/gavin-s-smith/pycforest.git
