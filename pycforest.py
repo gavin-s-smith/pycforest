@@ -221,14 +221,14 @@ class pycforest(object):
             vars = self.X.columns
                   
         rtn = r.variable_importance(self.r_model, var = vars, type = type, nperm = nperm, oob=oob, interaction = interaction)#, gav_method = gav_method)
-         
+        
+
+        
         df_p = pandas2ri.ri2py(rtn)
         
         df = pd.DataFrame(df_p,columns=["importance"])
-        print(df.shape)
-        print(vars.shape)
-        print(list(vars)+['interaction'])
-        df = df.assign(factors = list(vars)+['interaction'])
+
+        df = df.assign(factors = list(vars)+['additive','joint'])
         
         return df
         
