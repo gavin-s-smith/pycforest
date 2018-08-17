@@ -15,16 +15,16 @@ https://cran.r-project.org/web/packages/edarf/edarf.pdf
 (4) Python rpy2 library
 
 ## How to install requirements on Ubuntu 18.04  
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9  
-sudo add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran35/'  
-sudo apt update  
-sudo apt install r-base  
-sudo R -e 'install.packages(c("party", "edarf"))'  
-sudo pip3 install rpy2
+`sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9`  
+`sudo add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran35/'`  
+`sudo apt update`  
+`sudo apt install r-base`  
+`sudo R -e 'install.packages(c("party", "edarf"))'`  
+`sudo pip3 install rpy2`
 
 
 ## Install via:  
-sudo pip3 install git+https://github.com/gavin-s-smith/pycforest.git
+`sudo pip3 install git+https://github.com/gavin-s-smith/pycforest.git`
 
 
 ## TODO: Make the wrapper sklearn compliant so it can be used with pdpbox
