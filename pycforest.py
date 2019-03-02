@@ -76,7 +76,6 @@ class pycforest(object):
                                         If None, all possible surrogates will be considered.
             debug (bool):               If true, display the types of the R dataframe as converted within
                                         the fit method.
-
         Returns:
             bool: The return value. True for success, False otherwise.
         '''
@@ -98,7 +97,6 @@ class pycforest(object):
         Args:
             X (pandas DataFrame, [n_samples, n_features]): The training input samples. Categorical features should be encoded as str. 
                                                            These will be converted to R factors.
-
             y (pandas DataFrame, [n_samples])]:             The output labels. If this is a classification problem these MUST be 
                                                             encoded as str.
         """
@@ -114,7 +112,9 @@ class pycforest(object):
         
         r('pclass <- class')
         if r.pclass(r_data[-1])[0] == "factor":
-            self.forest_type_is_classification = True
+           self.forest_type_is_classification = True
+        else:
+          self.forest_type_is_classification = False
         
       
         if self.mtry == None:
@@ -127,6 +127,9 @@ class pycforest(object):
         self.r_model = r.cforest(formula=r.as_formula(r.paste('labels', r.paste(X.columns, collapse=" + "), sep=" ~ ")), data=r_data, control = r.cforest_unbiased(mtry = self.mtry, ntree=self.n_trees, maxsurrogate = self.maxsurrogate))
         
         self.fitct += 1
+        
+        if self.debug:
+          print('Fitted model with: forest_type_is_classification = {}'.format(self.forest_type_is_classification))
         
       
     
@@ -145,7 +148,6 @@ class pycforest(object):
                                         If None, all possible surrogates will be considered.
             debug (bool):               If true, display the types of the R dataframe as converted within
                                         the fit method.
-
         Returns:
             bool: The return value. True for success, False otherwise.
         """
@@ -169,10 +171,12 @@ class pycforest(object):
         
         return np.asarray(rtn)
     
-    def get_oob_prediction_accuracy(self):
+    def get_oob_prediction_accuracy(self, relative_score = True):
         
         """
         Computes and returns the out-of-bag prediction accuracy for the random forest.
+        
+        relative_score (bool): Only applicable to regression. If True, divide the result by the mean of y. 
         
         Returns:
         
@@ -186,14 +190,19 @@ class pycforest(object):
         
         r('as_vector <- as.vector')
         if self.oob_prediction_accuracy is None or self.fitct -1 > self.oobpredct:
-           
-            self.oob_prediction_accuracy = np.mean(self.y.values.flatten() == self.predict())
+            if self.forest_type_is_classification:           
+                self.oob_prediction_accuracy = np.mean(self.y.values.flatten() == self.predict())
+            else:
+                if relative_score:
+                    self.oob_prediction_accuracy = np.mean(np.abs(self.y.values.flatten() - self.predict())) / np.mean(np.abs(self.y.values.flatten()))
+                else:
+                    self.oob_prediction_accuracy = np.mean(np.abs(self.y.values.flatten() - self.predict())) 
             
             self.oobpredct += 1
         
         return self.oob_prediction_accuracy
         
-    def permutation_importance(self, interaction = False, oob = True, vars = None, type = "aggregate", nperm = 10): #, gav_method = True):
+    def permutation_importance(self, interaction = False, oob = True, vars = None, type = "aggregate", nperm = 10, relative_score = True): #, gav_method = True):
         
         """
         Computes the permutation importance.
@@ -206,9 +215,10 @@ class pycforest(object):
             vars (list of variable names or None):
                                        
                                        
-            type (str):              
+            type (str):     
+            
+            relative_score (bool): Only applicable to regression. If True, divide the result by the mean of y.         
                                         
-
         Returns:
             bool: The return value. True for success, False otherwise.
         """
@@ -219,17 +229,25 @@ class pycforest(object):
         
         if vars is None:
             vars = self.X.columns
-                  
-        rtn = r.variable_importance(self.r_model, var = vars, type = type, nperm = nperm, oob=oob, interaction = interaction)#, gav_method = gav_method)
+        
+        rtn = r.variable_importance(self.r_model, var = np.asarray(vars), nperm = nperm, interaction = interaction)#, gav_method = gav_method)
         
 
-        
+         
         df_p = pandas2ri.ri2py(rtn)
         
-        df = pd.DataFrame(df_p,columns=["importance"])
-
-        df = df.assign(factors = list(vars)+['additive','joint'])
-        
+        if interaction:
+            if relative_score:
+                df = pd.DataFrame(df_p / np.mean(self.y),columns=['_'.join(vars)])
+            else:
+                df = pd.DataFrame(df_p,columns=['_'.join(vars)])
+        else:
+            if relative_score:
+                df = pd.DataFrame(np.asarray(df_p).T / np.mean(self.y),columns=vars)
+            else:
+                df = pd.DataFrame(np.asarray(df_p).T,columns=vars) 
+ 
+         
         return df
         
     
