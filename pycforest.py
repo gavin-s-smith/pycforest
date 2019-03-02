@@ -23,9 +23,11 @@ import rpy2
 import numpy as np
 import pandas as pd
 from rpy2.robjects.packages import importr
-from rpy2.robjects import r, pandas2ri
+from rpy2.robjects import r, pandas2ri, numpy2ri
 
+numpy2ri.activate()
 pandas2ri.activate()
+
 
 importr('party')
 importr('edarf')
